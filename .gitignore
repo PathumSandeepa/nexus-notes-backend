@@ -14,7 +14,10 @@ db.sqlite3
 
 # Environment variables
 .env
-.env.*
+!.env.example
+
+# Uploads (local dev storage)
+uploads/
 
 # VS Code
 .vscode/
