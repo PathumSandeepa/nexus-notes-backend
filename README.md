@@ -48,6 +48,43 @@ A production-ready, full-stack note-taking application deployed on AWS EC2 using
 └── .env
 ```
 
+## Infrastructure Diagram
+
+```mermaid
+graph TB
+    User((Internet User))
+    
+    subgraph AWS["AWS Cloud (ap-southeast-1)"]
+        subgraph EC2["EC2 t3.micro (13.229.118.243)"]
+            subgraph Docker["Docker Network"]
+                NGINX[Nginx\nports 80/443]
+                FE[Frontend Container\nnginx:alpine\nReact Static Files]
+                BE[Backend Container\nGunicorn\nDjango:8000]
+                DB[(PostgreSQL\nport 5432\ninternal only)]
+            end
+        end
+        
+        subgraph S3["S3 Bucket"]
+            BUCKET[nexus-notes-files\nFile Uploads]
+        end
+        
+        subgraph IAM["IAM"]
+            USER[nexus-notes-s3-user\nS3 Access Only]
+        end
+        
+        subgraph SG["Security Group"]
+            RULES[Port 80 ✅ Public\nPort 443 ✅ Public\nPort 22 ✅ My IP\nPort 5432 ❌ Blocked\nPort 8000 ❌ Blocked]
+        end
+    end
+    
+    User -->|HTTP/HTTPS| NGINX
+    NGINX -->|/api/ requests| BE
+    NGINX -->|/ requests| FE
+    BE -->|queries| DB
+    BE -->|upload files| BUCKET
+    USER -->|IAM credentials| BUCKET
+```
+
 ## 1. Architecture Design
 
 The Nexus Notes system utilizes a modern containerized architecture deployed on a single AWS EC2 instance, designed for simplicity, ease of deployment, and demonstration of full-stack integration.
