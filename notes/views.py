@@ -109,10 +109,10 @@ class S3UploadView(APIView):
             unique_filename = f"uploads/{uuid.uuid4()}{file_extension}"
             
             s3_client.upload_fileobj(
-                file_obj,
-                bucket_name,
-                unique_filename,
-                ExtraArgs={'ACL': 'public-read', 'ContentType': file_obj.content_type}
+               file_obj,
+               bucket_name,
+               unique_filename,
+               ExtraArgs={'ContentType': file_obj.content_type}
             )
             
             region = os.environ.get('AWS_S3_REGION_NAME')
